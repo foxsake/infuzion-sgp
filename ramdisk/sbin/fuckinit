@@ -1,0 +1,32 @@
+#!/system/bin/sh
+
+/sbin/busybox --install -s /sbin/busybox
+
+# Enable init.d support
+if /sbin/busybox test -d /system/etc/init.d ; then
+	logwrapper run-parts /system/etc/init.d
+	chmod 777 /system/etc/init.d/*
+fi
+sync
+
+
+# Fix permissions in /sbin
+chmod 750 /sbin/*
+
+chmod u+s /sbin/busybox
+chmod 06755 /sbin/su
+
+# Add /devices Link for /sys/devices to fix a bug
+if test ! -f /devices ; then
+	ln -s /sys/devices /devices
+fi
+sync
+
+# add hotplug governor
+insmod /lib/modules/cpufreq_hotplug.ko
+sleep 1
+
+# your samsung galaxy pocket had just been fucked!
+# tweaking for infuZion kernel
+exit 0
+
